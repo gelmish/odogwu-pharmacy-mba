@@ -1,0 +1,202 @@
+{
+  "kpis": {
+    "total_revenue": 5848510.0,
+    "total_baskets": 3000,
+    "avg_basket_value": 1949.5,
+    "avg_basket_size": 2.14,
+    "rules_found": 3
+  },
+  "top_products": [
+    {
+      "product_name": "Blood Pressure Monitor",
+      "revenue": 2249500.0
+    },
+    {
+      "product_name": "Glucometer Strips",
+      "revenue": 470400.0
+    },
+    {
+      "product_name": "Artemether-Lumefantrine",
+      "revenue": 330300.0
+    },
+    {
+      "product_name": "Sunscreen SPF50",
+      "revenue": 257600.0
+    },
+    {
+      "product_name": "Amoxicillin 500mg",
+      "revenue": 247800.0
+    },
+    {
+      "product_name": "Atorvastatin 20mg",
+      "revenue": 209400.0
+    },
+    {
+      "product_name": "Multivitamin Tablets",
+      "revenue": 199000.0
+    },
+    {
+      "product_name": "Omeprazole 20mg",
+      "revenue": 178650.0
+    },
+    {
+      "product_name": "Cough Syrup",
+      "revenue": 167200.0
+    },
+    {
+      "product_name": "Metronidazole 400mg",
+      "revenue": 148800.0
+    }
+  ],
+  "cat_revenue": [
+    {
+      "category": "Devices",
+      "revenue": 2719900.0
+    },
+    {
+      "category": "Cardiovascular",
+      "revenue": 471300.0
+    },
+    {
+      "category": "Antimalarials",
+      "revenue": 456300.0
+    },
+    {
+      "category": "Vitamins",
+      "revenue": 437560.0
+    },
+    {
+      "category": "Antibiotics",
+      "revenue": 396600.0
+    },
+    {
+      "category": "Gastro",
+      "revenue": 273450.0
+    },
+    {
+      "category": "Skincare",
+      "revenue": 257600.0
+    },
+    {
+      "category": "Respiratory",
+      "revenue": 250920.0
+    },
+    {
+      "category": "Maternal Health",
+      "revenue": 157820.0
+    },
+    {
+      "category": "Antihistamines",
+      "revenue": 145480.0
+    },
+    {
+      "category": "Diabetes",
+      "revenue": 122850.0
+    },
+    {
+      "category": "Analgesics",
+      "revenue": 122250.0
+    },
+    {
+      "category": "Rehydration",
+      "revenue": 36480.0
+    }
+  ],
+  "monthly": [
+    {
+      "month": "2024-01",
+      "revenue": 462440.0,
+      "baskets": 263
+    },
+    {
+      "month": "2024-02",
+      "revenue": 500710.0,
+      "baskets": 257
+    },
+    {
+      "month": "2024-03",
+      "revenue": 573600.0,
+      "baskets": 280
+    },
+    {
+      "month": "2024-04",
+      "revenue": 338400.0,
+      "baskets": 200
+    },
+    {
+      "month": "2024-05",
+      "revenue": 542830.0,
+      "baskets": 258
+    },
+    {
+      "month": "2024-06",
+      "revenue": 462850.0,
+      "baskets": 237
+    },
+    {
+      "month": "2024-07",
+      "revenue": 465890.0,
+      "baskets": 255
+    },
+    {
+      "month": "2024-08",
+      "revenue": 455640.0,
+      "baskets": 251
+    },
+    {
+      "month": "2024-09",
+      "revenue": 489700.0,
+      "baskets": 230
+    },
+    {
+      "month": "2024-10",
+      "revenue": 524440.0,
+      "baskets": 271
+    },
+    {
+      "month": "2024-11",
+      "revenue": 498940.0,
+      "baskets": 236
+    },
+    {
+      "month": "2024-12",
+      "revenue": 533070.0,
+      "baskets": 262
+    }
+  ],
+  "top_rules": [
+    {
+      "rule": "Iron Supplement  \u2192  Folic Acid 5mg",
+      "antecedents": "Iron Supplement",
+      "consequents": "Folic Acid 5mg",
+      "support": 0.0283,
+      "confidence": 0.3484,
+      "lift": 4.214,
+      "bundle_price": 430.0,
+      "suggested_bundle_price": 387.0,
+      "estimated_saving": 43.0
+    },
+    {
+      "rule": "Folic Acid 5mg  \u2192  Iron Supplement",
+      "antecedents": "Folic Acid 5mg",
+      "consequents": "Iron Supplement",
+      "support": 0.0283,
+      "confidence": 0.3427,
+      "lift": 4.214,
+      "bundle_price": 430.0,
+      "suggested_bundle_price": 387.0,
+      "estimated_saving": 43.0
+    },
+    {
+      "rule": "Nasal Decongestant  \u2192  Cough Syrup",
+      "antecedents": "Nasal Decongestant",
+      "consequents": "Cough Syrup",
+      "support": 0.026,
+      "confidence": 0.3451,
+      "lift": 3.3726,
+      "bundle_price": 640.0,
+      "suggested_bundle_price": 576.0,
+      "estimated_saving": 64.0
+    }
+  ]
+}

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odogwu Pharmacy — Market Basket Analysis</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --green:   #1a7a4a;
+    --green-l: #25a862;
+    --green-x: #e8f7ef;
+    --amber:   #d97706;
+    --red:     #dc2626;
+    --ink:     #111827;
+    --muted:   #6b7280;
+    --border:  #e5e7eb;
+    --card:    #ffffff;
+    --bg:      #f3f4f6;
+    --radius:  10px;
+    --shadow:  0 1px 4px rgba(0,0,0,.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+
+  /* ── Header ── */
+  .header {
+    background: var(--green);
+    color: #fff;
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .header-icon { font-size: 28px; }
+  .header h1  { font-size: 20px; font-weight: 700; }
+  .header p   { font-size: 13px; opacity: .75; margin-top: 2px; }
+  .header-badge {
+    margin-left: auto;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3);
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* ── Layout ── */
+  .main  { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+  .grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+  .col-span2 { grid-column: span 2; }
+  .mb { margin-bottom: 20px; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px 24px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ── KPI cards ── */
+  .kpi { text-align: center; padding: 20px 16px; }
+  .kpi-val  { font-size: 30px; font-weight: 800; color: var(--green); line-height: 1; }
+  .kpi-lbl  { font-size: 12px; color: var(--muted); margin-top: 6px; text-transform: uppercase; letter-spacing:.4px; }
+  .kpi-sub  { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ── Section label ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    margin: 28px 0 12px;
+    padding-left: 2px;
+    border-left: 3px solid var(--green);
+    padding-left: 10px;
+  }
+
+  /* ── Rules table ── */
+  .rules-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .rules-table thead th {
+    text-align: left; padding: 10px 12px;
+    border-bottom: 2px solid var(--border);
+    color: var(--muted); font-size: 11px;
+    text-transform: uppercase; letter-spacing: .5px;
+    white-space: nowrap;
+  }
+  .rules-table tbody td { padding: 11px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .rules-table tbody tr:last-child td { border-bottom: none; }
+  .rules-table tbody tr:hover { background: var(--green-x); }
+
+  .lift-badge {
+    display: inline-block;
+    background: var(--green-x);
+    color: var(--green);
+    font-weight: 700;
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+  .lift-badge.high { background: #fef3c7; color: #92400e; }
+
+  .conf-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .conf-bar { height: 6px; background: var(--border); border-radius: 3px; flex: 1; min-width: 60px; }
+  .conf-bar-fill { height: 100%; background: var(--green-l); border-radius: 3px; transition: width .3s; }
+
+  .price-pill {
+    display: inline-flex; gap: 4px; align-items: center;
+    background: #f0fdf4; border: 1px solid #bbf7d0;
+    color: #166534; font-size: 11px; padding: 3px 8px; border-radius: 20px;
+  }
+  .price-pill s { color: var(--muted); }
+
+  /* ── Bar list (top products) ── */
+  .bar-list { display: flex; flex-direction: column; gap: 10px; }
+  .bar-item  { display: grid; grid-template-columns: 160px 1fr 80px; align-items: center; gap: 10px; font-size: 13px; }
+  .bar-item .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { background: var(--border); border-radius: 4px; height: 8px; }
+  .bar-fill  { background: var(--green-l); height: 100%; border-radius: 4px; }
+  .bar-val   { text-align: right; font-size: 12px; font-weight: 600; color: var(--muted); }
+
+  /* ── Methodology box ── */
+  .method-box {
+    background: var(--green-x);
+    border-left: 4px solid var(--green);
+    border-radius: 6px;
+    padding: 16px 20px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #1f4a34;
+    margin-top: 20px;
+  }
+  .method-box strong { color: var(--green); }
+
+  /* ── Footer ── */
+  .footer { text-align: center; padding: 24px; font-size: 12px; color: var(--muted); }
+
+  @media(max-width:900px) {
+    .grid4,.grid3 { grid-template-columns: repeat(2,1fr); }
+    .grid2 { grid-template-columns: 1fr; }
+    .col-span2 { grid-column: span 1; }
+    .bar-item { grid-template-columns: 120px 1fr 70px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">💊</div>
+  <div>
+    <h1>Odogwu Pharmacy — Market Basket Analysis</h1>
+    <p>Cross-sell opportunities · Bundling experiment · Pricing intelligence</p>
+  </div>
+  <div class="header-badge">Sample Data · 2024</div>
+</div>
+
+<div class="main">
+
+  <!-- KPIs -->
+  <div class="section-label">Key Performance Indicators</div>
+  <div class="grid4 mb">
+    <div class="card kpi">
+      <div class="kpi-val" id="kpi-revenue">—</div>
+      <div class="kpi-lbl">Total Revenue</div>
+      <div class="kpi-sub">12 months</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" id="kpi-baskets">—</div>
+      <div class="kpi-lbl">Total Baskets</div>
+      <div class="kpi-sub">unique transactions</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" id="kpi-abv">—</div>
+      <div class="kpi-lbl">Avg Basket Value</div>
+      <div class="kpi-sub">₦ per transaction</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" id="kpi-rules">—</div>
+      <div class="kpi-lbl">Rules Discovered</div>
+      <div class="kpi-sub">lift > 1.2, conf > 30%</div>
+    </div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="section-label">Revenue Trends</div>
+  <div class="grid2 mb">
+    <div class="card">
+      <div class="card-title">📈 Monthly Revenue (₦)</div>
+      <canvas id="monthlyChart" height="200"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">🗂 Revenue by Category</div>
+      <canvas id="catChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Top products + rules -->
+  <div class="grid2 mb">
+    <!-- Top products bar list -->
+    <div class="card">
+      <div class="card-title">🏆 Top Products by Revenue</div>
+      <div class="bar-list" id="topProducts"></div>
+    </div>
+
+    <!-- Cross-sell rules full width -->
+    <div class="card col-span2" style="overflow-x:auto;">
+      <div class="card-title">🔗 Cross-Sell Association Rules</div>
+      <table class="rules-table">
+        <thead>
+          <tr>
+            <th>If Customer Buys</th>
+            <th>They Also Buy</th>
+            <th>Support</th>
+            <th>Confidence</th>
+            <th>Lift ↑</th>
+            <th>Bundle Pricing</th>
+          </tr>
+        </thead>
+        <tbody id="rulesBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Methodology -->
+  <div class="method-box">
+    <strong>How this was built:</strong> Raw transaction data was pulled from <strong>SQLite via SQL queries</strong>,
+    pivoted into a boolean basket matrix (3,000 baskets × 25 products) using <strong>Pandas</strong>, then fed into
+    the <strong>Apriori algorithm (mlxtend)</strong> with min_support=2%, min_confidence=30%, min_lift=1.2.
+    Association rules surface product pairs that co-occur significantly more than chance — the lift score quantifies
+    how much more likely the consequent is given the antecedent. Bundle prices are set at a <strong>10% discount</strong>
+    on the sum of individual prices, creating a clear customer value proposition while maintaining margin.
+    A lift > 3.0 indicates a very strong cross-sell signal worth prioritising in a bundling experiment.
+  </div>
+
+</div>
+
+<div class="footer">Odogwu Pharmacy · Market Basket Analysis Report · Sample data generated for demonstration · Replace with live SQL exports to operationalise</div>
+
+<script>
+// ── Embedded analysis results ────────────────────────────────────────────────
+const DATA = {"kpis":{"total_revenue":5848510.0,"total_baskets":3000,"avg_basket_value":1949.5,"avg_basket_size":2.14,"rules_found":3},"top_products":[{"product_name":"Blood Pressure Monitor","revenue":2249500.0},{"product_name":"Glucometer Strips","revenue":470400.0},{"product_name":"Artemether-Lumefantrine","revenue":330300.0},{"product_name":"Sunscreen SPF50","revenue":257600.0},{"product_name":"Amoxicillin 500mg","revenue":247800.0},{"product_name":"Atorvastatin 20mg","revenue":209400.0},{"product_name":"Multivitamin Tablets","revenue":199000.0},{"product_name":"Omeprazole 20mg","revenue":178650.0},{"product_name":"Cough Syrup","revenue":167200.0},{"product_name":"Metronidazole 400mg","revenue":148800.0}],"cat_revenue":[{"category":"Devices","revenue":2719900.0},{"category":"Cardiovascular","revenue":471300.0},{"category":"Antimalarials","revenue":456300.0},{"category":"Vitamins","revenue":437560.0},{"category":"Antibiotics","revenue":396600.0},{"category":"Gastro","revenue":273450.0},{"category":"Skincare","revenue":257600.0},{"category":"Respiratory","revenue":250920.0},{"category":"Maternal Health","revenue":157820.0},{"category":"Antihistamines","revenue":145480.0},{"category":"Diabetes","revenue":122850.0},{"category":"Analgesics","revenue":122250.0},{"category":"Rehydration","revenue":36480.0}],"monthly":[{"month":"2024-01","revenue":462440.0,"baskets":263},{"month":"2024-02","revenue":500710.0,"baskets":257},{"month":"2024-03","revenue":573600.0,"baskets":280},{"month":"2024-04","revenue":338400.0,"baskets":200},{"month":"2024-05","revenue":542830.0,"baskets":258},{"month":"2024-06","revenue":462850.0,"baskets":237},{"month":"2024-07","revenue":465890.0,"baskets":255},{"month":"2024-08","revenue":455640.0,"baskets":251},{"month":"2024-09","revenue":489700.0,"baskets":230},{"month":"2024-10","revenue":524440.0,"baskets":271},{"month":"2024-11","revenue":498940.0,"baskets":236},{"month":"2024-12","revenue":533070.0,"baskets":262}],"top_rules":[{"rule":"Iron Supplement  \u2192  Folic Acid 5mg","antecedents":"Iron Supplement","consequents":"Folic Acid 5mg","support":0.0283,"confidence":0.3484,"lift":4.214,"bundle_price":430.0,"suggested_bundle_price":387.0,"estimated_saving":43.0},{"rule":"Folic Acid 5mg  \u2192  Iron Supplement","antecedents":"Folic Acid 5mg","consequents":"Iron Supplement","support":0.0283,"confidence":0.3427,"lift":4.214,"bundle_price":430.0,"suggested_bundle_price":387.0,"estimated_saving":43.0},{"rule":"Nasal Decongestant  \u2192  Cough Syrup","antecedents":"Nasal Decongestant","consequents":"Cough Syrup","support":0.026,"confidence":0.3451,"lift":3.3726,"bundle_price":640.0,"suggested_bundle_price":576.0,"estimated_saving":64.0}]};
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+const fmt = n => n >= 1e6 ? `₦${(n/1e6).toFixed(2)}M` : n >= 1e3 ? `₦${(n/1e3).toFixed(1)}K` : `₦${n.toFixed(0)}`;
+const pct = n => (n * 100).toFixed(1) + '%';
+
+// ── KPIs ─────────────────────────────────────────────────────────────────────
+document.getElementById('kpi-revenue').textContent = fmt(DATA.kpis.total_revenue);
+document.getElementById('kpi-baskets').textContent = DATA.kpis.total_baskets.toLocaleString();
+document.getElementById('kpi-abv').textContent     = fmt(DATA.kpis.avg_basket_value);
+document.getElementById('kpi-rules').textContent   = DATA.kpis.rules_found;
+
+// ── Monthly revenue chart ─────────────────────────────────────────────────────
+new Chart(document.getElementById('monthlyChart'), {
+  type: 'bar',
+  data: {
+    labels: DATA.monthly.map(d => d.month.slice(5)), // "Jan"..."Dec"
+    datasets: [{
+      label: 'Revenue (₦)',
+      data: DATA.monthly.map(d => d.revenue),
+      backgroundColor: '#25a86222',
+      borderColor: '#1a7a4a',
+      borderWidth: 2,
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { ticks: { callback: v => `₦${(v/1000).toFixed(0)}K` }, grid: { color: '#f0f0f0' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── Category doughnut ─────────────────────────────────────────────────────────
+const CAT_COLORS = ['#1a7a4a','#25a862','#4ade80','#86efac','#bbf7d0','#d97706','#f59e0b','#fbbf24','#fcd34d','#fde68a','#6b7280','#9ca3af','#d1d5db'];
+new Chart(document.getElementById('catChart'), {
+  type: 'doughnut',
+  data: {
+    labels: DATA.cat_revenue.map(d => d.category),
+    datasets: [{ data: DATA.cat_revenue.map(d => d.revenue), backgroundColor: CAT_COLORS, borderWidth: 2, borderColor: '#fff' }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'right', labels: { font: { size: 11 }, boxWidth: 12 } },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${fmt(ctx.raw)}` } }
+    },
+    cutout: '55%'
+  }
+});
+
+// ── Top products bar list ─────────────────────────────────────────────────────
+const maxRev = DATA.top_products[0].revenue;
+const prodEl = document.getElementById('topProducts');
+DATA.top_products.forEach(p => {
+  const pct = (p.revenue / maxRev * 100).toFixed(1);
+  prodEl.innerHTML += `
+    <div class="bar-item">
+      <div class="name" title="${p.product_name}">${p.product_name}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div class="bar-val">${fmt(p.revenue)}</div>
+    </div>`;
+});
+
+// ── Association rules table ───────────────────────────────────────────────────
+const tbody = document.getElementById('rulesBody');
+DATA.top_rules.forEach(r => {
+  const liftClass = r.lift >= 4 ? '' : 'high';
+  const confWidth = (r.confidence * 100).toFixed(0);
+  tbody.innerHTML += `
+    <tr>
+      <td><strong>${r.antecedents}</strong></td>
+      <td>${r.consequents}</td>
+      <td style="color:#6b7280;font-size:12px">${(r.support*100).toFixed(1)}% of baskets</td>
+      <td>
+        <div class="conf-bar-wrap">
+          <div class="conf-bar"><div class="conf-bar-fill" style="width:${confWidth}%"></div></div>
+          <span style="font-size:12px;white-space:nowrap">${confWidth}%</span>
+        </div>
+      </td>
+      <td><span class="lift-badge ${liftClass}">${r.lift.toFixed(2)}×</span></td>
+      <td>
+        <span class="price-pill">
+          <s>₦${r.bundle_price.toLocaleString()}</s>
+          → ₦${r.suggested_bundle_price.toLocaleString()}
+          <strong style="color:#166534">save ₦${r.estimated_saving.toLocaleString()}</strong>
+        </span>
+      </td>
+    </tr>`;
+});
+</script>
+</body>
+</html>
